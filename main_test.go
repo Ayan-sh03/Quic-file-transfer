@@ -4,13 +4,9 @@ import (
 	"bytes"
 	"context"
 	"crypto/tls"
-	"fmt"
 	"io"
-	"log"
-	"net"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"sync"
 	"testing"
@@ -68,7 +64,7 @@ func TestFileTransfer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to dial: %v", err)
 	}
-	defer conn.Close()
+	// defer conn.
 
 	// Create a test file and its content
 	testFilename := "test_file.txt"
