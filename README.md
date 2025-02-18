@@ -4,8 +4,8 @@ This project implements a simple QUIC-based file transfer server.
 
 ## Prerequisites
 
--   Go (version 1.18 or later)
--   quic-go library
+- Go (version 1.18 or later)
+- quic-go library
 
 ## Getting Started
 
@@ -28,3 +28,6 @@ This project implements a simple QUIC-based file transfer server.
 
 To run the tests, use the following command:
 
+    ```bash
+    go test ./..
+    ```
