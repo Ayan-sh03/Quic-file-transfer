@@ -7,7 +7,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -123,7 +122,7 @@ func TestFileTransfer(t *testing.T) {
 	//	}
 	//	return nil
 	//})
-    //
+	//
 	//if err != nil && err != io.EOF {
 	//	t.Fatalf("Error walking directory: %v", err)
 	//}
@@ -131,7 +130,7 @@ func TestFileTransfer(t *testing.T) {
 	//if createdFile == "" {
 	//	t.Fatalf("File was not created")
 	//}
-    createdFile = filepath.Join(tempDir, createdFile)
+	createdFile = filepath.Join(tempDir, createdFile)
 
 	// Read the content of the created file
 	createdFileContent, err := os.ReadFile(createdFile)
