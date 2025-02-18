@@ -1,0 +1,4 @@
+.aider*
+.env
+test_file_*.txt
+test_file.txt
