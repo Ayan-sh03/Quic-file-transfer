@@ -18,9 +18,16 @@ import (
 	"github.com/quic-go/quic-go"
 )
 
-var fileCreationMutex sync.Mutex
+var (
+	fileCreationMutex sync.Mutex
+	fileCreatedChan   chan string // Channel to signal file creation
+)
 
 func main() {
+	// Initialize the file created channel
+	fileCreatedChan = make(chan string)
+	defer close(fileCreatedChan)
+
 	// Generate TLS config
 	tlsConfig := generateTLSConfig()
 
@@ -69,7 +76,8 @@ func main() {
 
 			// Create the file
 			timestamp := time.Now().Format("20060102150405")
-			file, err := os.Create(string(filename) + "_" + timestamp + ".txt")
+			filePath := string(filename) + "_" + timestamp + ".txt"
+			file, err := os.Create(filePath)
 			if err != nil {
 				log.Println("Failed to create file:", err)
 				return
@@ -85,6 +93,9 @@ func main() {
 			}
 
 			fmt.Println("File received successfully!")
+
+			// Signal that the file has been created
+			fileCreatedChan <- filePath
 		}()
 	}
 }

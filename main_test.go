@@ -64,7 +64,6 @@ func TestFileTransfer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to dial: %v", err)
 	}
-	// defer conn.
 
 	// Create a test file and its content
 	testFilename := "test_file.txt"
@@ -103,29 +102,36 @@ func TestFileTransfer(t *testing.T) {
 		t.Fatalf("Failed to close stream: %v", err)
 	}
 
-	// Wait for a short time to allow the server to process the file
-	time.Sleep(1 * time.Second)
+	// Wait for the file creation signal
+	var createdFile string
+	select {
+	case filePath := <-fileCreatedChan:
+		createdFile = filePath
+	case <-time.After(5 * time.Second):
+		t.Fatal("Timeout waiting for file creation signal")
+	}
 
 	// Check if the file was created
-	var createdFile string
-	err = filepath.Walk(tempDir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() && strings.HasPrefix(info.Name(), testFilename) {
-			createdFile = path
-			return io.EOF // Stop walking
-		}
-		return nil
-	})
+	//var createdFile string
+	//err = filepath.Walk(tempDir, func(path string, info os.FileInfo, err error) error {
+	//	if err != nil {
+	//		return err
+	//	}
+	//	if !info.IsDir() && strings.HasPrefix(info.Name(), testFilename) {
+	//		createdFile = path
+	//		return io.EOF // Stop walking
+	//	}
+	//	return nil
+	//})
+    //
+	//if err != nil && err != io.EOF {
+	//	t.Fatalf("Error walking directory: %v", err)
+	//}
 
-	if err != nil && err != io.EOF {
-		t.Fatalf("Error walking directory: %v", err)
-	}
-
-	if createdFile == "" {
-		t.Fatalf("File was not created")
-	}
+	//if createdFile == "" {
+	//	t.Fatalf("File was not created")
+	//}
+    createdFile = filepath.Join(tempDir, createdFile)
 
 	// Read the content of the created file
 	createdFileContent, err := os.ReadFile(createdFile)
@@ -137,10 +143,6 @@ func TestFileTransfer(t *testing.T) {
 	if string(createdFileContent) != testFileContent {
 		t.Errorf("File content does not match. Expected: %q, got: %q", testFileContent, string(createdFileContent))
 	}
-
-	// Stop the server (optional, but good practice)
-	// You might need a way to signal the server to stop gracefully
-	// For this example, we'll just let it run until the test ends
 
 	serverWg.Wait() // Wait for the server to finish (in case you signal it to stop)
 }
