@@ -1,0 +1,14 @@
+
+## Makefile
+
+This project includes a `Makefile` to simplify common tasks.
+
+### Available Commands
+
+-   `make run`: Runs the server.
+-   `make test`: Runs the tests.
+
+### Usage
+
+To run the server using the `Makefile`, execute:
+
