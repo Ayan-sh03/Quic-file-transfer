@@ -13,10 +13,13 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"sync"
 	"time"
 
 	"github.com/quic-go/quic-go"
 )
+
+var fileCreationMutex sync.Mutex
 
 func main() {
 	// Generate TLS config
@@ -61,8 +64,13 @@ func main() {
 				return
 			}
 
+			// Lock the file creation process
+			fileCreationMutex.Lock()
+			defer fileCreationMutex.Unlock()
+
 			// Create the file
-			file, err := os.Create(string(filename) + "_" + time.Now().Format("20060102150405") + ".txt")
+			timestamp := time.Now().Format("20060102150405")
+			file, err := os.Create(string(filename) + "_" + timestamp + ".txt")
 			if err != nil {
 				log.Println("Failed to create file:", err)
 				return
