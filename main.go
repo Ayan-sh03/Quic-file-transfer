@@ -12,7 +12,6 @@ import (
 	"log"
 	"math/big"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/quic-go/quic-go"

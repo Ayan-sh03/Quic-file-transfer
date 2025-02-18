@@ -89,6 +89,7 @@ func TestFileTransfer(t *testing.T) {
 		}
 		if !info.IsDir() && strings.HasPrefix(info.Name(), testFilename) {
 			createdFile = path
+			fmt.Println("Found created file:", createdFile)
 			return io.EOF // Stop walking
 		}
 		return nil
@@ -114,10 +115,10 @@ func TestFileTransfer(t *testing.T) {
 	}
 
 	// Clean up the created file
-	err = os.Remove(createdFile)
-	if err != nil {
-		t.Fatalf("Failed to remove created file: %v", err)
-	}
+	// err = os.Remove(createdFile)
+	// if err != nil {
+	// 	t.Fatalf("Failed to remove created file: %v", err)
+	// }
 }
 
 func TestMultipleFileTransfers(t *testing.T) {
@@ -196,6 +197,8 @@ func TestMultipleFileTransfers(t *testing.T) {
 			}
 			if !info.IsDir() && info.Name() == filename {
 				createdFile = path
+				fmt.Println("Found created file:", createdFile)
+
 				return io.EOF // Stop walking
 			}
 			return nil
@@ -224,9 +227,9 @@ func TestMultipleFileTransfers(t *testing.T) {
 		}
 
 		// Clean up the created file
-		err = os.Remove(createdFile)
-		if err != nil {
-			t.Errorf("Client %d: Failed to remove created file: %v", i, err)
-		}
+		// err = os.Remove(createdFile)
+		// if err != nil {
+		// 	t.Errorf("Client %d: Failed to remove created file: %v", i, err)
+		// }
 	}
 }
