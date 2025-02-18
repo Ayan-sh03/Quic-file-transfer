@@ -103,6 +103,7 @@ func main() {
 				log.Println("Failed to get absolute path:", err)
 				return
 			}
+			fmt.Println("File path:", absPath)
 			fileCreatedChan <- absPath
 		}()
 	}

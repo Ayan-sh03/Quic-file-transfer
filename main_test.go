@@ -43,7 +43,7 @@ func TestFileTransfer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to dial: %v", err)
 	}
-	defer conn.Close()
+	// defer conn.Close()
 
 	// Create a test file and its content
 	testFilename := "test_file.txt"
