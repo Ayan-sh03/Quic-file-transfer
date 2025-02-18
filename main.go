@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	fileCreationMutex sync.Mutex
+// fileCreationMutex sync.Mutex
 )
 
 func main() {
@@ -66,8 +66,8 @@ func main() {
 			}
 
 			// Lock the file creation process
-			fileCreationMutex.Lock()
-			defer fileCreationMutex.Unlock()
+			// fileCreationMutex.Lock()
+			// defer fileCreationMutex.Unlock()
 
 			// Create the file
 			// timestamp := time.Now().Format("20060102150405")
