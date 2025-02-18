@@ -29,11 +29,6 @@ func TestGenerateTLSConfig(t *testing.T) {
 }
 
 func TestFileTransfer(t *testing.T) {
-	// Start the server in a goroutine
-
-	// Wait for a short time to allow the server to start
-	time.Sleep(1 * time.Second)
-
 	// Create a QUIC configuration for the client
 	tlsConf := &tls.Config{
 		InsecureSkipVerify: true,
@@ -48,6 +43,7 @@ func TestFileTransfer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to dial: %v", err)
 	}
+	defer conn.Close()
 
 	// Create a test file and its content
 	testFilename := "test_file.txt"
@@ -111,5 +107,4 @@ func TestFileTransfer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to remove created file: %v", err)
 	}
-
 }
