@@ -28,6 +28,4 @@ This project implements a simple QUIC-based file transfer server.
 
 To run the tests, use the following command:
 
-    ```bash
     go test ./..
-    ```
