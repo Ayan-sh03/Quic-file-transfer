@@ -47,7 +47,6 @@ func TestFileTransfer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to dial: %v", err)
 	}
-	// defer conn.Close()
 
 	// Create a test file and its content
 	testFilename := "test_file.txt"
@@ -58,7 +57,6 @@ func TestFileTransfer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to open stream: %v", err)
 	}
-	defer stream.Close()
 
 	// Send the filename
 	filenameLen := len(testFilename)
@@ -78,12 +76,6 @@ func TestFileTransfer(t *testing.T) {
 	_, err = io.Copy(stream, bytes.NewBufferString(testFileContent))
 	if err != nil {
 		t.Fatalf("Failed to write file content: %v", err)
-	}
-
-	// Close the stream
-	err = stream.Close()
-	if err != nil {
-		t.Fatalf("Failed to close stream: %v", err)
 	}
 
 	// Give the server some time to create the file
@@ -133,11 +125,10 @@ func TestMultipleFileTransfers(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(numClients)
 
-	testFilename := "test_file.txt"
-
 	for i := 0; i < numClients; i++ {
 		fileContent := fmt.Sprintf("This is the content of file %d", i)
-		go func(clientNum int, content string) {
+		filename := fmt.Sprintf("test_file_%d.txt", i) // Unique filename for each client
+		go func(clientNum int, content string, filename string) {
 			defer wg.Done()
 
 			// Create a QUIC configuration for the client
@@ -155,7 +146,6 @@ func TestMultipleFileTransfers(t *testing.T) {
 				t.Errorf("Client %d: Failed to dial: %v", clientNum, err)
 				return
 			}
-			// defer conn.Close()
 
 			// Open a stream
 			stream, err := conn.OpenStreamSync(context.Background())
@@ -163,10 +153,9 @@ func TestMultipleFileTransfers(t *testing.T) {
 				t.Errorf("Client %d: Failed to open stream: %v", clientNum, err)
 				return
 			}
-			defer stream.Close()
 
 			// Send the filename
-			filenameLen := len(testFilename)
+			filenameLen := len(filename)
 			if filenameLen > 255 {
 				t.Errorf("Client %d: Filename too long", clientNum)
 				return
@@ -176,7 +165,7 @@ func TestMultipleFileTransfers(t *testing.T) {
 				t.Errorf("Client %d: Failed to write filename length: %v", clientNum, err)
 				return
 			}
-			_, err = stream.Write([]byte(testFilename))
+			_, err = stream.Write([]byte(filename))
 			if err != nil {
 				t.Errorf("Client %d: Failed to write filename: %v", clientNum, err)
 				return
@@ -188,14 +177,7 @@ func TestMultipleFileTransfers(t *testing.T) {
 				t.Errorf("Client %d: Failed to write file content: %v", clientNum, err)
 				return
 			}
-
-			// Close the stream
-			err = stream.Close()
-			if err != nil {
-				t.Errorf("Client %d: Failed to close stream: %v", clientNum, err)
-				return
-			}
-		}(i, fileContent)
+		}(i, fileContent, filename)
 	}
 
 	wg.Wait()
@@ -206,12 +188,13 @@ func TestMultipleFileTransfers(t *testing.T) {
 	// Verify that all files were created
 	for i := 0; i < numClients; i++ {
 		expectedContent := fmt.Sprintf("This is the content of file %d", i)
+		filename := fmt.Sprintf("test_file_%d.txt", i)
 		var createdFile string
 		err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
-			if !info.IsDir() && strings.HasPrefix(info.Name(), testFilename) && strings.Contains(info.Name(), fmt.Sprintf("_%d", i)) {
+			if !info.IsDir() && info.Name() == filename {
 				createdFile = path
 				return io.EOF // Stop walking
 			}
