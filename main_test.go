@@ -6,8 +6,6 @@ import (
 	"crypto/tls"
 	"io"
 	"os"
-	"path/filepath"
-	"sync"
 	"testing"
 	"time"
 
@@ -32,12 +30,6 @@ func TestGenerateTLSConfig(t *testing.T) {
 
 func TestFileTransfer(t *testing.T) {
 	// Start the server in a goroutine
-	var serverWg sync.WaitGroup
-	serverWg.Add(1)
-	go func() {
-		defer serverWg.Done()
-		main() // Run the server's main function
-	}()
 
 	// Wait for a short time to allow the server to start
 	time.Sleep(1 * time.Second)
@@ -120,5 +112,4 @@ func TestFileTransfer(t *testing.T) {
 		t.Fatalf("Failed to remove created file: %v", err)
 	}
 
-	serverWg.Wait() // Wait for the server to finish (in case you signal it to stop)
 }
