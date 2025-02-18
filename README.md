@@ -12,8 +12,8 @@ This project implements a simple QUIC-based file transfer server.
 1.  **Clone the repository:**
 
     ```bash
-    git clone <repository_url>
-    cd <repository_directory>
+    git clone https://github.com/Ayan-sh03/Quic-file-transfer
+    cd Quic-file-transfer
     ```
 
 2.  **Run the server:**
