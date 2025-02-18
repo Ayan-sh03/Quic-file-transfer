@@ -31,13 +31,6 @@ func TestGenerateTLSConfig(t *testing.T) {
 }
 
 func TestFileTransfer(t *testing.T) {
-	// Create a temporary directory for testing
-	tempDir, err := os.MkdirTemp("", "test-files")
-	if err != nil {
-		t.Fatalf("Failed to create temp dir: %v", err)
-	}
-	defer os.RemoveAll(tempDir)
-
 	// Start the server in a goroutine
 	var serverWg sync.WaitGroup
 	serverWg.Add(1)
@@ -110,28 +103,6 @@ func TestFileTransfer(t *testing.T) {
 		t.Fatal("Timeout waiting for file creation signal")
 	}
 
-	// Check if the file was created
-	//var createdFile string
-	//err = filepath.Walk(tempDir, func(path string, info os.FileInfo, err error) error {
-	//	if err != nil {
-	//		return err
-	//	}
-	//	if !info.IsDir() && strings.HasPrefix(info.Name(), testFilename) {
-	//		createdFile = path
-	//		return io.EOF // Stop walking
-	//	}
-	//	return nil
-	//})
-	//
-	//if err != nil && err != io.EOF {
-	//	t.Fatalf("Error walking directory: %v", err)
-	//}
-
-	//if createdFile == "" {
-	//	t.Fatalf("File was not created")
-	//}
-	createdFile = filepath.Join(tempDir, createdFile)
-
 	// Read the content of the created file
 	createdFileContent, err := os.ReadFile(createdFile)
 	if err != nil {
@@ -141,6 +112,12 @@ func TestFileTransfer(t *testing.T) {
 	// Check if the content is correct
 	if string(createdFileContent) != testFileContent {
 		t.Errorf("File content does not match. Expected: %q, got: %q", testFileContent, string(createdFileContent))
+	}
+
+	// Clean up the created file
+	err = os.Remove(createdFile)
+	if err != nil {
+		t.Fatalf("Failed to remove created file: %v", err)
 	}
 
 	serverWg.Wait() // Wait for the server to finish (in case you signal it to stop)
