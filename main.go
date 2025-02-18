@@ -12,6 +12,7 @@ import (
 	"log"
 	"math/big"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
 
@@ -77,7 +78,14 @@ func main() {
 			// Create the file
 			timestamp := time.Now().Format("20060102150405")
 			filePath := string(filename) + "_" + timestamp + ".txt"
-			file, err := os.Create(filePath)
+			// Get the absolute path
+			absPath, err := filepath.Abs(filePath)
+			if err != nil {
+				log.Println("Failed to get absolute path:", err)
+				return
+			}
+
+			file, err := os.Create(absPath)
 			if err != nil {
 				log.Println("Failed to create file:", err)
 				return
@@ -95,7 +103,7 @@ func main() {
 			fmt.Println("File received successfully!")
 
 			// Signal that the file has been created
-			fileCreatedChan <- filePath
+			fileCreatedChan <- absPath
 		}()
 	}
 }
