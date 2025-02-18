@@ -70,8 +70,8 @@ func main() {
 			defer fileCreationMutex.Unlock()
 
 			// Create the file
-			timestamp := time.Now().Format("20060102150405")
-			filePath := string(filename) + "_" + timestamp + ".txt"
+			// timestamp := time.Now().Format("20060102150405")
+			filePath := string(filename)
 
 			file, err := os.Create(filePath)
 			if err != nil {
