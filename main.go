@@ -12,7 +12,6 @@ import (
 	"log"
 	"math/big"
 	"os"
-	"path/filepath"
 	"sync"
 	"time"
 
@@ -21,14 +20,9 @@ import (
 
 var (
 	fileCreationMutex sync.Mutex
-	fileCreatedChan   chan string // Channel to signal file creation
 )
 
 func main() {
-	// Initialize the file created channel
-	fileCreatedChan = make(chan string)
-	defer close(fileCreatedChan)
-
 	// Generate TLS config
 	tlsConfig := generateTLSConfig()
 
@@ -95,16 +89,6 @@ func main() {
 			}
 
 			fmt.Println("File received successfully!")
-
-			// Signal that the file has been created
-			// Get the absolute path
-			absPath, err := filepath.Abs(filePath)
-			if err != nil {
-				log.Println("Failed to get absolute path:", err)
-				return
-			}
-			fmt.Println("File path:", absPath)
-			fileCreatedChan <- absPath
 		}()
 	}
 }

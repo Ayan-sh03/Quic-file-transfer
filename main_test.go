@@ -6,6 +6,8 @@ import (
 	"crypto/tls"
 	"io"
 	"os"
+	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -43,7 +45,7 @@ func TestFileTransfer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to dial: %v", err)
 	}
-	// defer conn.Close()
+	defer conn.Close()
 
 	// Create a test file and its content
 	testFilename := "test_file.txt"
@@ -82,13 +84,28 @@ func TestFileTransfer(t *testing.T) {
 		t.Fatalf("Failed to close stream: %v", err)
 	}
 
-	// Wait for the file creation signal
+	// Give the server some time to create the file
+	time.Sleep(2 * time.Second)
+
+	// Construct the expected file path
 	var createdFile string
-	select {
-	case filePath := <-fileCreatedChan:
-		createdFile = filePath
-	case <-time.After(5 * time.Second):
-		t.Fatal("Timeout waiting for file creation signal")
+	err = filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() && strings.HasPrefix(info.Name(), testFilename) {
+			createdFile = path
+			return io.EOF // Stop walking
+		}
+		return nil
+	})
+
+	if err != nil && err != io.EOF {
+		t.Fatalf("Error walking directory: %v", err)
+	}
+
+	if createdFile == "" {
+		t.Fatalf("File was not created")
 	}
 
 	// Read the content of the created file
